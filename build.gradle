@@ -1,0 +1,57 @@
+plugins {
+    id "java"
+    id "maven-publish"
+    id "dev.arbjerg.lavalink.gradle-plugin" version "1.0.15"
+}
+
+group = "com.github.Ankush26030"
+version = "1.0.0"
+
+lavalinkPlugin {
+    name = "amazonmusic-plugin"
+    apiVersion = "4.0.0"
+    serverVersion = "4.0.0"
+    configurePublishing = false
+    path = "com.ankush.amzplugin.plugin"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    maven { url "https://maven.lavalink.dev/releases" }
+    maven { url "https://maven.topi.wtf/releases" }
+    jcenter()
+}
+
+dependencies {
+    compileOnly "dev.arbjerg.lavalink:plugin-api:4.0.0"
+    implementation "dev.arbjerg.lavalink:Lavalink-Server:4.0.0"
+    compileOnly "dev.arbjerg:lavaplayer:2.2.2"
+    compileOnly "com.github.topi314.lavasearch:lavasearch-plugin:1.0.0"
+    implementation "org.jsoup:jsoup:1.15.3"
+    implementation "commons-io:commons-io:2.11.0"
+}
+
+compileJava.options.encoding = "UTF-8"
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(Javadoc).configureEach {
+    enabled = false
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
