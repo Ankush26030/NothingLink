@@ -1,0 +1,38 @@
+allprojects {
+    group = "com.github.Ankush26030"
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://maven.lavalink.dev/releases" }
+        jcenter()
+    }
+}
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "maven-publish"
+
+    version "1.0.0"
+
+    compileJava.options.encoding = "UTF-8"
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    tasks.withType(Javadoc).configureEach {
+        enabled = false
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                groupId = findProperty("group") ?: project.group
+            }
+        }
+    }
+}

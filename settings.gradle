@@ -1,0 +1,3 @@
+rootProject.name = "NothingLink"
+include(":main")
+include(":plugin")

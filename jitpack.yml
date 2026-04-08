@@ -1,0 +1,4 @@
+jdk:
+  - openjdk21
+install:
+  - ./gradlew clean :plugin:publishToMavenLocal -Pgroup=com.github.Ankush26030 -Pversion=VERSION
