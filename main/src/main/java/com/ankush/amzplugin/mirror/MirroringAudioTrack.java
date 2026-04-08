@@ -1,0 +1,64 @@
+package com.ankush.amzplugin.mirror;
+
+import com.ankush.amzplugin.ExtendedAudioTrack;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.tools.io.PersistentHttpStream;
+import com.sedmelluq.discord.lavaplayer.tools.io.SeekableInputStream;
+import com.sedmelluq.discord.lavaplayer.track.*;
+import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.net.URI;
+import java.util.concurrent.CompletableFuture;
+
+public abstract class MirroringAudioTrack extends ExtendedAudioTrack {
+	private static final Logger log = LoggerFactory.getLogger(MirroringAudioTrack.class);
+	protected final MirroringAudioSourceManager sourceManager;
+
+	public MirroringAudioTrack(AudioTrackInfo trackInfo, String albumName, String albumUrl, String artistUrl, String artistArtworkUrl, String previewUrl, boolean isPreview, MirroringAudioSourceManager sourceManager) {
+		super(trackInfo, albumName, albumUrl, artistUrl, artistArtworkUrl, previewUrl, isPreview);
+		this.sourceManager = sourceManager;
+	}
+
+	protected abstract InternalAudioTrack createAudioTrack(AudioTrackInfo trackInfo, SeekableInputStream inputStream);
+
+	@Override
+	public void process(LocalAudioTrackExecutor executor) throws Exception {
+		if (this.isPreview) {
+			if (this.previewUrl == null) throw new FriendlyException("No preview url found", FriendlyException.Severity.COMMON, new IllegalArgumentException());
+			try (var httpInterface = sourceManager.getHttpInterface()) {
+				try (var stream = new PersistentHttpStream(httpInterface, new URI(previewUrl), trackInfo.length)) {
+					processDelegate(createAudioTrack(trackInfo, stream), executor);
+				}
+			}
+			return;
+		}
+		var track = sourceManager.getResolver().apply(this);
+		if (track instanceof AudioPlaylist) {
+			var tracks = ((AudioPlaylist) track).getTracks();
+			if (tracks.isEmpty()) throw new TrackNotFoundException("No tracks found");
+			track = tracks.get(0);
+		}
+		if (track instanceof InternalAudioTrack) {
+			((InternalAudioTrack) track).setUserData(getUserData());
+			processDelegate((InternalAudioTrack) track, executor);
+			return;
+		}
+		throw new TrackNotFoundException("No mirror found for track");
+	}
+
+	@Override public AudioSourceManager getSourceManager() { return sourceManager; }
+
+	public AudioItem loadItem(String query) {
+		var cf = new CompletableFuture<AudioItem>();
+		sourceManager.getAudioPlayerManager().loadItem(query, new AudioLoadResultHandler() {
+			@Override public void trackLoaded(AudioTrack track) { cf.complete(track); }
+			@Override public void playlistLoaded(AudioPlaylist playlist) { cf.complete(playlist); }
+			@Override public void noMatches() { cf.complete(AudioReference.NO_TRACK); }
+			@Override public void loadFailed(FriendlyException e) { cf.completeExceptionally(e); }
+		});
+		return cf.join();
+	}
+}
