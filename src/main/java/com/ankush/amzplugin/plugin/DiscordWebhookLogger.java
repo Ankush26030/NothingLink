@@ -71,6 +71,7 @@ public class DiscordWebhookLogger {
 
     private volatile boolean shuttingDown = false;
     private volatile long lastSendTime = 0;
+    private boolean searchLoggingEnabled = false;
 
     // ──────────────────────────────────── Embed colors
     private static final int COLOR_SUCCESS = 0x2ECC71; // Green
@@ -96,6 +97,10 @@ public class DiscordWebhookLogger {
 
     public DiscordWebhookLogger(String webhookUrl) {
         this(webhookUrl, "NothingLink", null);
+    }
+
+    public void setSearchLoggingEnabled(boolean enabled) {
+        this.searchLoggingEnabled = enabled;
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -261,6 +266,7 @@ public class DiscordWebhookLogger {
      */
     public void logSearch(String query, String source, int resultCount) {
         totalSearches.incrementAndGet();
+        if (!searchLoggingEnabled) return;
 
         List<EmbedField> fields = new ArrayList<>();
         fields.add(new EmbedField("🔍 Query", "`" + truncate(query, 200) + "`", false));

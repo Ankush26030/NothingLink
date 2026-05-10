@@ -50,6 +50,7 @@ public class AmzPlugin implements AudioPlayerManagerConfiguration, SearchManager
 					nlConfig.getWebhookUrl(),
 					nlConfig.getWebhookBotName(),
 					null);
+			this.webhook.setSearchLoggingEnabled(nlConfig.isLogSearchEvents());
 			log.info("Discord webhook logger enabled (bot={}, trackEvents={}, searchEvents={})",
 					nlConfig.getWebhookBotName(), nlConfig.isLogTrackEvents(), nlConfig.isLogSearchEvents());
 
