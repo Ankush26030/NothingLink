@@ -9,7 +9,6 @@ public class NothingLinkConfig {
 	private String webhookUrl = "";
 	private boolean webhookEnabled = false;
 	private String webhookBotName = "NothingLink";
-	private String webhookAvatarUrl = "";
 	private boolean logTrackEvents = true;
 	private boolean logSearchEvents = false;
 
@@ -35,14 +34,6 @@ public class NothingLinkConfig {
 
 	public void setWebhookBotName(String webhookBotName) {
 		this.webhookBotName = webhookBotName;
-	}
-
-	public String getWebhookAvatarUrl() {
-		return webhookAvatarUrl;
-	}
-
-	public void setWebhookAvatarUrl(String webhookAvatarUrl) {
-		this.webhookAvatarUrl = webhookAvatarUrl;
 	}
 
 	public boolean isLogTrackEvents() {
