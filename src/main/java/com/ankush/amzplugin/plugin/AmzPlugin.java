@@ -23,7 +23,7 @@ import java.util.Map;
 @Service("amzPluginService")
 public class AmzPlugin implements AudioPlayerManagerConfiguration, SearchManagerConfiguration {
 	private static final Logger log = LoggerFactory.getLogger(AmzPlugin.class);
-	private static final String VERSION = "1.0.4";
+	private static final String VERSION = "1.0.6";
 
 	private AudioPlayerManager manager;
 	private AmazonMusicSourceManager amazonMusic;
