@@ -99,19 +99,32 @@ plugins:
 | `searchLimit` | integer | `6` | Max search results |
 | `providers` | string[] | YouTube search | Audio resolution providers |
 
-### Discord Webhook Logger
+### 📡 Discord Webhook Logger
+- 🚀 **Detailed Startup**: Logs plugin version, system info, and source status.
+- ▶️ **Track Events**: Logs when tracks start, end (with reason), or fail.
+- 🔍 **Activity Logs**: See what users are searching for in real-time.
+- 🛑 **Shutdown Reports**: Final session summary (uptime, total tracks) on shutdown or crash.
+- 🛡️ **Rate Limited**: Built-in protection to stay safe from Discord webhook bans.
 
 ```yaml
 plugins:
     nothinglink:
         webhookEnabled: true
         webhookUrl: "YOUR_DISCORD_WEBHOOK_URL"
+        webhookBotName: "NothingLink"
+        webhookAvatarUrl: ""
+        logTrackEvents: true
+        logSearchEvents: true
 ```
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `webhookEnabled` | boolean | `false` | Enable/disable Discord webhook logs |
 | `webhookUrl` | string | `""` | Discord webhook URL |
+| `webhookBotName` | string | `"NothingLink"` | Name of the bot in Discord |
+| `webhookAvatarUrl`| string | `""` | URL for the bot's avatar |
+| `logTrackEvents` | boolean | `true` | Log song start/stop/error |
+| `logSearchEvents` | boolean | `false` | Log user searches |
 
 ### Full Example
 
@@ -136,7 +149,9 @@ plugins:
             - "ytsearch:%QUERY%"
     nothinglink:
         webhookEnabled: true
-        webhookUrl: "YOUR_DISCORD_WEBHOOK_URL"
+        webhookUrl: "YOUR_DISCORD_WEBHOOK_URL"  
+        webhookBotName: "NothingLink Logger"
+        logTrackEvents: true
 ```
 
 ---

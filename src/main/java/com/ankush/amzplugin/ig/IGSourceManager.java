@@ -24,11 +24,13 @@ public class IGSourceManager implements AudioSourceManager {
     private static final Logger log = LoggerFactory.getLogger(IGSourceManager.class);
 
     private static final Pattern RE_AUDIO = Pattern.compile("https?://(?:www\\.)?instagram\\.com/reels/audio/(\\d+)");
-    private static final Pattern RE_POST  = Pattern.compile("https?://(?:www\\.)?instagram\\.com/p/([\\w-]+)");
-    private static final Pattern RE_REEL  = Pattern.compile("https?://(?:www\\.)?instagram\\.com/(?:reels?|reel)/([\\w-]+)");
+    private static final Pattern RE_POST = Pattern.compile("https?://(?:www\\.)?instagram\\.com/p/([\\w-]+)");
+    private static final Pattern RE_REEL = Pattern
+            .compile("https?://(?:www\\.)?instagram\\.com/(?:reels?|reel)/([\\w-]+)");
 
     private final IGMediaResolver resolver;
     private final HttpInterfaceManager httpManager;
+    private com.ankush.amzplugin.plugin.DiscordWebhookLogger webhook;
 
     public IGSourceManager() {
         this.resolver = new IGMediaResolver();
@@ -36,21 +38,36 @@ public class IGSourceManager implements AudioSourceManager {
     }
 
     @Override
-    public String getSourceName() { return "instagram"; }
+    public String getSourceName() {
+        return "instagram";
+    }
 
-    public IGMediaResolver getResolver() { return resolver; }
+    public IGMediaResolver getResolver() {
+        return resolver;
+    }
 
-    public HttpInterface getHttpInterface() { return httpManager.getInterface(); }
+    public void setWebhook(com.ankush.amzplugin.plugin.DiscordWebhookLogger webhook) {
+        this.webhook = webhook;
+    }
+
+    public HttpInterface getHttpInterface() {
+        return httpManager.getInterface();
+    }
 
     @Override
     public AudioItem loadItem(AudioPlayerManager manager, AudioReference ref) {
         String id = ref.identifier;
         try {
             Matcher m;
-            if ((m = RE_AUDIO.matcher(id)).find()) return fromAudio(id, m.group(1));
-            if ((m = RE_POST.matcher(id)).find())  return fromPost(id, m.group(1), "p");
-            if ((m = RE_REEL.matcher(id)).find())   return fromPost(id, m.group(1), "reel");
+            if ((m = RE_AUDIO.matcher(id)).find())
+                return fromAudio(id, m.group(1));
+            if ((m = RE_POST.matcher(id)).find())
+                return fromPost(id, m.group(1), "p");
+            if ((m = RE_REEL.matcher(id)).find())
+                return fromPost(id, m.group(1), "reel");
         } catch (Exception e) {
+            if (webhook != null)
+                webhook.logLoadFailed(id, getSourceName(), e.getMessage());
             throw new FriendlyException("Instagram load failed", FriendlyException.Severity.SUSPICIOUS, e);
         }
         return null;
@@ -67,17 +84,33 @@ public class IGSourceManager implements AudioSourceManager {
     }
 
     private AudioItem toTrack(IGMediaResolver.MediaInfo mi, String url, String identifier) {
-        if (mi.streamUrl == null) return AudioReference.NO_TRACK;
-        AudioTrackInfo info = new AudioTrackInfo(mi.title, mi.author, mi.durationMs, identifier, false, url, mi.artworkUrl, null);
+        if (mi.streamUrl == null)
+            return AudioReference.NO_TRACK;
+        AudioTrackInfo info = new AudioTrackInfo(mi.title, mi.author, mi.durationMs, identifier, false, url,
+                mi.artworkUrl, null);
         return new IGTrack(info, mi.streamUrl, this);
     }
 
-    @Override public boolean isTrackEncodable(AudioTrack t) { return true; }
-    @Override public void encodeTrack(AudioTrack t, DataOutput out) {}
-    @Override public AudioTrack decodeTrack(AudioTrackInfo info, DataInput in) { return new IGTrack(info, null, this); }
+    @Override
+    public boolean isTrackEncodable(AudioTrack t) {
+        return true;
+    }
+
+    @Override
+    public void encodeTrack(AudioTrack t, DataOutput out) {
+    }
+
+    @Override
+    public AudioTrack decodeTrack(AudioTrackInfo info, DataInput in) {
+        return new IGTrack(info, null, this);
+    }
 
     @Override
     public void shutdown() {
-        try { httpManager.close(); } catch (IOException e) { log.error("Failed closing IG http manager", e); }
+        try {
+            httpManager.close();
+        } catch (IOException e) {
+            log.error("Failed closing IG http manager", e);
+        }
     }
 }
