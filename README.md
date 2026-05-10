@@ -112,7 +112,6 @@ plugins:
         webhookEnabled: true
         webhookUrl: "YOUR_DISCORD_WEBHOOK_URL"
         webhookBotName: "NothingLink"
-        webhookAvatarUrl: ""
         logTrackEvents: true
         logSearchEvents: true
 ```
@@ -122,7 +121,6 @@ plugins:
 | `webhookEnabled` | boolean | `false` | Enable/disable Discord webhook logs |
 | `webhookUrl` | string | `""` | Discord webhook URL |
 | `webhookBotName` | string | `"NothingLink"` | Name of the bot in Discord |
-| `webhookAvatarUrl`| string | `""` | URL for the bot's avatar |
 | `logTrackEvents` | boolean | `true` | Log song start/stop/error |
 | `logSearchEvents` | boolean | `false` | Log user searches |
 
@@ -214,7 +212,7 @@ cd NothingLink
 ./gradlew clean build
 ```
 
-Output: `build/libs/NothingLink-1.0.5.jar`
+Output: `build/libs/NothingLink-1.0.6.jar`
 
 ---
 
