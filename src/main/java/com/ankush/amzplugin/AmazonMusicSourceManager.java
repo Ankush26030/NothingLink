@@ -34,7 +34,7 @@ public class AmazonMusicSourceManager extends MirroringAudioSourceManager implem
 			Pattern.CASE_INSENSITIVE);
 	public static final String SEARCH_PREFIX = "amzsearch:";
 	public static final Set<AudioSearchResult.Type> SEARCH_TYPES = Set.of(AudioSearchResult.Type.TRACK);
-	private static final String API_BASE = "http://us2.leonodes.xyz:15482";
+	private static final String API_BASE = "http://140.245.242.153:8083";
 	private static final long FAILURE_CACHE_TTL_MS = 30_000L;
 	private static final int FAILURE_CACHE_CLEANUP_THRESHOLD = 256;
 	private int searchLimit = 10;
